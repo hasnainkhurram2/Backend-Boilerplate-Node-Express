@@ -1,0 +1,65 @@
+version: '3.9'
+
+# Used by CI (GitHub Actions) for integration tests.
+# Spins up isolated test databases and runs the test suite.
+
+services:
+  test:
+    build:
+      context: .
+      target: builder
+    command: npm run test:integration
+    env_file:
+      - .env.test
+    environment:
+      NODE_ENV: test
+      POSTGRES_HOST: postgres_test
+      MONGO_URI: mongodb://mongo_test:27017/myapp_test
+      REDIS_HOST: redis_test
+    depends_on:
+      postgres_test:
+        condition: service_healthy
+      mongo_test:
+        condition: service_healthy
+      redis_test:
+        condition: service_healthy
+    networks:
+      - test_network
+
+  postgres_test:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: myapp_test
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - test_network
+
+  mongo_test:
+    image: mongo:7-jammy
+    healthcheck:
+      test: ['CMD', 'mongosh', '--eval', "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - test_network
+
+  redis_test:
+    image: redis:7-alpine
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - test_network
+
+networks:
+  test_network:
+    driver: bridge

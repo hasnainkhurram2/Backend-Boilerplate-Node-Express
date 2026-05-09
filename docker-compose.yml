@@ -1,0 +1,95 @@
+version: '3.9'
+
+services:
+  app:
+    build:
+      context: .
+      target: builder
+    command: npm run dev
+    ports:
+      - '${PORT:-3000}:3000'
+    env_file:
+      - .env
+    environment:
+      # .env uses localhost for host-side dev; inside Compose, use service names.
+      POSTGRES_HOST: postgres
+      REDIS_HOST: redis
+      MONGO_URI: mongodb://mongo:27017/${POSTGRES_DB:-myapp}
+      # Published port maps to container 3000 — keep listen port aligned.
+      PORT: 3000
+    volumes:
+      - .:/app
+      - /app/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - backend
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      POSTGRES_DB: ${POSTGRES_DB:-myapp}
+    ports:
+      - '${POSTGRES_PORT:-5432}:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-postgres}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - backend
+
+  mongo:
+    image: mongo:7-jammy
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ['CMD', 'mongosh', '--eval', "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - backend
+
+  redis:
+    image: redis:7-alpine
+    env_file:
+      - .env
+    command: >
+      sh -c 'if [ -z "$$REDIS_PASSWORD" ]; then exec redis-server; else exec redis-server --requirepass "$$REDIS_PASSWORD"; fi'
+    ports:
+      - '${REDIS_PORT:-6379}:6379'
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'if [ -z "$$REDIS_PASSWORD" ]; then redis-cli ping; else redis-cli -a "$$REDIS_PASSWORD" ping; fi',
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - backend
+
+volumes:
+  postgres_data:
+  mongo_data:
+  redis_data:
+
+networks:
+  backend:
+    driver: bridge
