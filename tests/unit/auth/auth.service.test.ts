@@ -77,7 +77,7 @@ describe('AuthService', () => {
   describe('login()', () => {
     it('should return tokens on valid credentials', async () => {
       const userWithPwd = { ...fakeUser, password: 'hashed' };
-      mockUserRepository.findUserByEmail.mockResolvedValue(userWithPwd as never);
+      mockUserRepository.findUserByEmail.mockResolvedValue(userWithPwd);
       mockPasswordUtil.comparePassword.mockResolvedValue(true);
       mockJwtUtil.signTokenPair.mockReturnValue({
         accessToken: 'access_token',
@@ -95,7 +95,7 @@ describe('AuthService', () => {
 
     it('should throw unauthorized on wrong password', async () => {
       const userWithPwd = { ...fakeUser, password: 'hashed' };
-      mockUserRepository.findUserByEmail.mockResolvedValue(userWithPwd as never);
+      mockUserRepository.findUserByEmail.mockResolvedValue(userWithPwd);
       mockPasswordUtil.comparePassword.mockResolvedValue(false);
 
       await expect(

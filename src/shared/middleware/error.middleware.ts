@@ -9,7 +9,6 @@ export function notFoundHandler(req: Request, res: Response): void {
   ApiResponse.error(res, `Route ${req.method} ${req.path} not found`, 404);
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function globalErrorHandler(
   err: unknown,
   _req: Request,

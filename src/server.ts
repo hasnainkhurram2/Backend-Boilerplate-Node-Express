@@ -16,12 +16,14 @@ async function bootstrap(): Promise<void> {
   });
 
   // Graceful shutdown
-  const shutdown = async (signal: string): Promise<void> => {
+  const shutdown = (signal: string): void => {
     logger.info(`${signal} received — shutting down gracefully`);
-    server.close(async () => {
-      await Promise.all([disconnectPostgres(), disconnectMongo(), disconnectRedis()]);
-      logger.info('All connections closed. Goodbye.');
-      process.exit(0);
+    server.close(() => {
+      void (async () => {
+        await Promise.all([disconnectPostgres(), disconnectMongo(), disconnectRedis()]);
+        logger.info('All connections closed. Goodbye.');
+        process.exit(0);
+      })();
     });
 
     // Force exit after 10 seconds if server hasn't closed
@@ -31,17 +33,17 @@ async function bootstrap(): Promise<void> {
     }, 10_000);
   };
 
-  process.on('SIGTERM', () => void shutdown('SIGTERM'));
-  process.on('SIGINT', () => void shutdown('SIGINT'));
+  process.on('SIGTERM', () => shutdown('SIGTERM'));
+  process.on('SIGINT', () => shutdown('SIGINT'));
 
   process.on('unhandledRejection', (reason) => {
     logger.error('Unhandled promise rejection', { reason });
-    void shutdown('unhandledRejection');
+    shutdown('unhandledRejection');
   });
 
   process.on('uncaughtException', (err) => {
     logger.error('Uncaught exception', { err });
-    void shutdown('uncaughtException');
+    shutdown('uncaughtException');
   });
 }
 

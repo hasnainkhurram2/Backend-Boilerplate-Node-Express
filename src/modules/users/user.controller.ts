@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { ApiResponse } from '@/shared/utils/api-response.util';
 import type { AuthenticatedRequest } from '@/shared/types';
-import type { ListUsersQuery, UpdateUserDto } from './user.types';
+import type { UpdateUserDto } from './user.types';
 import * as UserService from './user.service';
 
 export async function getMe(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -33,7 +33,7 @@ export async function listUsers(
   next: NextFunction,
 ): Promise<void> {
   try {
-    const { data, meta } = await UserService.listUsers(req.query as ListUsersQuery);
+    const { data, meta } = await UserService.listUsers(req.query);
     ApiResponse.success(res, data, 'Users retrieved', 200, meta);
   } catch (err) {
     next(err);

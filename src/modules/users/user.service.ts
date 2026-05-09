@@ -1,6 +1,6 @@
 import { AppError } from '@/shared/errors/AppError';
 import { hashPassword } from '@/shared/utils/password.util';
-import type { PaginationMeta, PaginationQuery } from '@/shared/types';
+import type { PaginationMeta } from '@/shared/types';
 import type { CreateUserDto, UpdateUserDto, UserDto, ListUsersQuery } from './user.types';
 import * as UserRepository from './user.repository';
 
@@ -13,7 +13,7 @@ export async function getUserById(id: string): Promise<UserDto> {
 export async function listUsers(
   query: ListUsersQuery,
 ): Promise<{ data: UserDto[]; meta: PaginationMeta }> {
-  return UserRepository.listUsers(query as PaginationQuery & { search?: string });
+  return UserRepository.listUsers(query);
 }
 
 export async function createUser(dto: CreateUserDto): Promise<UserDto> {
