@@ -9,7 +9,12 @@ import * as AuthController from './auth.controller';
 const router = Router();
 
 // Local auth
-router.post('/register', authRateLimiter, validate({ body: registerSchema }), AuthController.register);
+router.post(
+  '/register',
+  authRateLimiter,
+  validate({ body: registerSchema }),
+  AuthController.register,
+);
 router.post('/login', authRateLimiter, validate({ body: loginSchema }), AuthController.login);
 router.post('/refresh', validate({ body: refreshSchema }), AuthController.refresh);
 router.post('/logout', authMiddleware(), AuthController.logout);
@@ -17,7 +22,10 @@ router.post('/logout', authMiddleware(), AuthController.logout);
 // Google OAuth2 — only mounted when GOOGLE_CLIENT_ID is set
 router.get(
   '/google',
-  passport.authenticate('google', { scope: ['profile', 'email'], session: false }) as RequestHandler,
+  passport.authenticate('google', {
+    scope: ['profile', 'email'],
+    session: false,
+  }) as RequestHandler,
 );
 router.get(
   '/google/callback',

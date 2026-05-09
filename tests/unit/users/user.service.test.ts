@@ -77,9 +77,7 @@ describe('UserService', () => {
 
     it('should throw 404 if user does not exist', async () => {
       mockRepo.findUserById.mockResolvedValue(null);
-      await expect(
-        UserService.updateUser('nonexistent', { name: 'X' }),
-      ).rejects.toThrow(AppError);
+      await expect(UserService.updateUser('nonexistent', { name: 'X' })).rejects.toThrow(AppError);
     });
   });
 

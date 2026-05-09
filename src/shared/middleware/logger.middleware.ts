@@ -9,6 +9,5 @@ const stream = {
 
 export const httpLogger = morgan(env.NODE_ENV === 'production' ? 'combined' : 'dev', {
   stream,
-  skip: (_req: Request, res: Response) =>
-    env.NODE_ENV === 'test' || res.statusCode < 400,
+  skip: (_req: Request, res: Response) => env.NODE_ENV === 'test' || res.statusCode < 400,
 });

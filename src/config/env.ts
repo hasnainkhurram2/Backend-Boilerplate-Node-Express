@@ -39,7 +39,11 @@ const envSchema = z.object({
   CORS_ORIGIN: z.string().default('*'),
 
   // Rate limiting
-  RATE_LIMIT_WINDOW_MS: z.coerce.number().int().positive().default(15 * 60 * 1000),
+  RATE_LIMIT_WINDOW_MS: z.coerce
+    .number()
+    .int()
+    .positive()
+    .default(15 * 60 * 1000),
   RATE_LIMIT_MAX: z.coerce.number().int().positive().default(100),
 });
 

@@ -43,10 +43,7 @@ export async function updateUser(id: string, dto: UpdateUserDto): Promise<UserDt
   return findUserById(id);
 }
 
-export async function updateRefreshToken(
-  id: string,
-  refreshToken: string | null,
-): Promise<void> {
+export async function updateRefreshToken(id: string, refreshToken: string | null): Promise<void> {
   await repo().update(id, { refreshToken: refreshToken ?? undefined });
 }
 

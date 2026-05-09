@@ -14,11 +14,7 @@ export async function getMe(req: Request, res: Response, next: NextFunction): Pr
   }
 }
 
-export async function getUserById(
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<void> {
+export async function getUserById(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const user = await UserService.getUserById(req.params['id'] as string);
     ApiResponse.success(res, user);
@@ -27,11 +23,7 @@ export async function getUserById(
   }
 }
 
-export async function listUsers(
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<void> {
+export async function listUsers(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const { data, meta } = await UserService.listUsers(req.query);
     ApiResponse.success(res, data, 'Users retrieved', 200, meta);
@@ -50,11 +42,7 @@ export async function updateMe(req: Request, res: Response, next: NextFunction):
   }
 }
 
-export async function deleteUser(
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<void> {
+export async function deleteUser(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     await UserService.deleteUser(req.params['id'] as string);
     ApiResponse.noContent(res);
